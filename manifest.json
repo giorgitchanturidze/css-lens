@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CSS Lens",
-  "description": "CSS Lens makes it easy for developers to inspect, debug, and optimize their web projects, ensuring pixel-perfect designs and faster development cycles.",
+  "description": "CSS Lens makes it easy for developers to inspect, debug, and optimize their web projects",
   "version": "1.0",
   "icons": {
     "16": "images/icon-16.png",
