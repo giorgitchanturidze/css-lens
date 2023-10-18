@@ -1,25 +1,44 @@
-// Description: This file contains the background script of the extension.
+let tabsWithCss = new Set();
 
-// When the user clicks on the extension action
-chrome.action.onClicked.addListener(async (tab) => {
-  // Check if the CSS is already inserted by getting the 'focusModeStatus' value from the storage
-  const { focusModeStatus } = await chrome.storage.local.get('focusModeStatus');
-  const nextState = focusModeStatus === 'ON' ? 'OFF' : 'ON';
+chrome.action.onClicked.addListener((tab) => {
+    if (tabsWithCss.has(tab.id)) {
+        removeStyles(tab.id);
+        tabsWithCss.delete(tab.id);
+    } else {
+        injectStyles(tab.id);
+        tabsWithCss.add(tab.id);
+    }
+});
 
-  // Save the nextState to the storage
-  await chrome.storage.local.set({ focusModeStatus: nextState });
-
-  if (nextState === 'ON') {
-    // Insert the CSS file when the user turns the extension on
-    await chrome.scripting.insertCSS({
-      files: ['focus-mode.css'],
-      target: { tabId: tab.id }
+function injectStyles(tabId) {
+    chrome.scripting.insertCSS({
+        target: { tabId: tabId },
+        files: ['lens.css']
     });
-  } else if (nextState === 'OFF') {
-    // Remove the CSS file when the user turns the extension off
-    await chrome.scripting.removeCSS({
-      files: ['focus-mode.css'],
-      target: { tabId: tab.id }
+    setIcon(tabId, 'icons/icon-on.png');
+}
+
+function removeStyles(tabId) {
+    chrome.scripting.removeCSS({
+        target: { tabId: tabId },
+        files: ['lens.css']
     });
-  }
+    setIcon(tabId, 'icons/icon-off.png');
+}
+
+function setIcon(tabId, iconPath) {
+    chrome.action.setIcon({
+        path: { '128': iconPath },
+        tabId: tabId
+    });
+}
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'loading' && tabsWithCss.has(tabId)) {
+        injectStyles(tabId);
+    }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+    tabsWithCss.delete(tabId);
 });
