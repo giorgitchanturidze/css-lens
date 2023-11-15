@@ -19,8 +19,8 @@
     "commands": {
         "_execute_action": {
           "suggested_key": {
-            "default": "Ctrl+Shift+Q",
-            "mac": "Command+Shift+Q"
+            "default": "Ctrl+Shift+L",
+            "mac": "Command+Shift+L"
           }
         }
     },
